@@ -181,10 +181,46 @@ def db_load(f):
 
   return roots
 
-def dumbplot(f,n=0):
+def dumbplot(f, n=0):
   if n == 0:
     roots = db_load(f)
   else:
     roots = roots_modp(f,2,n)
 
   return scatter_plot([(i,0) for i in roots])
+
+def density(f, precision=10):
+  roots = db_load(f)
+  
+  count = dict()
+  for i in range(0,precision):
+    count[i] = 0
+
+  interval = 1/precision.n()
+  for i in range(0,precision):
+    low = i*interval
+    high = (i+1)*interval
+    for r in roots:
+      if low <= r < high:
+        count[i] += 1
+
+  return count
+
+def density_plot(f, precision=10, normalize=False):
+
+  count = density(f, precision)
+
+  if normalize:
+    total = 0
+    for i in count.keys():
+      total += count[i]
+  else:
+    total = 1
+
+
+  interval = 1/precision.n()
+  lst = list()
+  for i in count.keys():
+    lst.append(((i+0.5)*interval, count[i]/total))
+
+  return scatter_plot(lst, markersize=3)
