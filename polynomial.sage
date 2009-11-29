@@ -1,4 +1,4 @@
-# All the polynomials are polynomials with integer coefficients
+import os.path
 
 def random_coefficients(n, min=-100, max=100):
   """ 
@@ -115,7 +115,8 @@ def roots_modp(f, p, n=1):
   return rootsp
 
 def db_filename(f):
-  filename = "degree" + str(f.degree()) + "_"
+  filename = "../data/"
+  filename += "degree" + str(f.degree()) + "_"
   filename += "id" + str(f.galois_group()).split()[3]
   c = f.coefficients()
   for i in c:
@@ -131,7 +132,7 @@ def db_record_roots(f, n=10):
   p = next_prime(db_read_last(f))
 
   filename = db_filename(f)
-  fdb = open("data/" + filename, 'a')
+  fdb = open(filename, 'a')
 
   count = 0
   # Record one at a time
@@ -149,28 +150,37 @@ def db_record_roots(f, n=10):
 
   return count
 
-
 def db_read_last(f):
   
-  import os.path
 
   filename = db_filename(f)
-  if not os.path.isfile("data/" + filename):
-    fdb = open("data/" + filename, 'w')
+  if not os.path.isfile(filename):
+    fdb = open(filename, 'w')
     fdb.close()
     p = 0
   else:
-    for line in open("data/" + filename):pass
+    for line in open(filename):pass
     p = QQ(line.split()[1])
 
   return p
 
-def plotroots(f, n=100, verbose=false):
-  roots = normalizedRoots(f,n,verbose)
+def db_load(f):
+  filename = db_filename(f)
+  if not os.path.isfile(filename):
+    print >> sys.stderr, "Database for this polynomial does not exist."
+    return 
+
+  roots = []
+  fdb = open(filename, 'r')
+  for line in fdb:
+    r = QQ(line.split()[0])
+    p = QQ(line.split()[1])
+    roots.append(r/p)
+
+  fdb.close()
+
+  return roots
+
+def dumbplot(f):
+  roots = db_load(f)
   return scatter_plot([(i,0) for i in roots])
-
-#print [(i,f(i)%13) for i in range(0,13)]
-
-#a = normalizedRoots(f,50)
-#print a
-
