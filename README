@@ -1,0 +1,6 @@
+The scripts here are to be used with Sage.
+
+Run Sage in the directory with these scripts, then do:
+Example:
+  sage: load "polynomial.sage"
+  sage: irreducible_polynomial(4) #Returns an irreducible polynomial of degree 4
