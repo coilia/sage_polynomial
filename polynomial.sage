@@ -181,6 +181,10 @@ def db_load(f):
 
   return roots
 
-def dumbplot(f):
-  roots = db_load(f)
+def dumbplot(f,n==0):
+  if n == 0:
+    roots = db_load(f)
+  else:
+    roots = roots_modp(f,2,n)
+
   return scatter_plot([(i,0) for i in roots])
