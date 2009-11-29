@@ -1,6 +1,43 @@
 The scripts here are to be used with Sage.
 
 Run Sage in the directory with these scripts, then do:
-Example:
   sage: load "polynomial.sage"
-  sage: irreducible_polynomial(4) #Returns an irreducible polynomial of degree 4
+
+
+Examples
+
+Simple example:
+  sage: irreducible_polynomial(4) # Returns an irreducible polynomial of degree 4
+
+Generating Normalized roots:
+
+# This sets x as an element of polynomial ring over rationals
+
+  sage: R.<x> = QQ[]  
+  sage: f = x^2 + 1
+
+# If you have TransitiveGroup installed, this should return an id of galois
+# group of f. 
+# You can install this optional sage package by running: 
+#   sage -i database_gap-4.4.10
+
+  sage: f.galois_group() 
+
+# This gives a list of normalized roots mod p for 10 prime numbers p starting
+# with 2
+
+  sage: roots_modp(f,2,10)
+
+# You can save this in a file. This records normalized roots of 10 primes.
+# If the database already exists, it will read the last line, and will continue
+# from there.
+
+  sage: db_record_roots(f, 10)
+
+#NOTE: This will give you an error if there is no directory called "data" in the
+PARENT directory of the current directory.
+
+
+# From the file database, you can make a plot...a dumb one though:
+
+  sage: dumb_plot(f)
