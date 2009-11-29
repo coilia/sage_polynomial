@@ -41,3 +41,12 @@ PARENT directory of the current directory.
 # From the file database, you can make a plot...a dumb one though:
 
   sage: dumb_plot(f)
+
+# You can also make a plot without a database. This will take long for large n:
+  
+  sage: dumb_plot(f,100)
+
+NOTE: This functionality was created so that you can test out plots with online
+interface, since you cannot create files there.
+For running on your computer, create the database first by running
+db_record_roots(f, n) first and then plot it.
