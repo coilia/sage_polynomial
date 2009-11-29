@@ -181,7 +181,7 @@ def db_load(f):
 
   return roots
 
-def dumbplot(f,n==0):
+def dumbplot(f,n=0):
   if n == 0:
     roots = db_load(f)
   else:
