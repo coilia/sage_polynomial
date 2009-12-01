@@ -41,7 +41,8 @@ def bruteforce(d, limit, record=False, filename='default', min=-100, max=100):
       print >> sys.stderr, tried, 
       tried_hundred = int(tried / 100)
 
-  fdb.close()
+  if record:
+    fdb.close()
 
 def check(d, filename='default'):
   if filename == 'default':
