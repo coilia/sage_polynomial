@@ -81,7 +81,9 @@ def integerize_coefficients(f):
   """
     
   d = list()
-  for c in f.coeffs():
+
+  # Use f.coefficients() since this omitts zero coefficients
+  for c in f.coefficients():
     if c.denominator() != 1:
       d.append(c.denominator())
   
