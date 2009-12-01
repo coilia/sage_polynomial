@@ -1,6 +1,6 @@
 load polynomial.sage
 
-d = 3
+d = 4
 
 def test_discriminant(f):
   return f.discriminant().is_square()
@@ -16,5 +16,6 @@ if __name__=='__main__':
       break
     
     count += 1
-    if a != count / 100:
-      a = count / 100
+    if a != int(count / 100):
+      print >> sys.stderr, count, 
+      a = int(count / 100)
