@@ -81,7 +81,7 @@ def integerize_coefficients(f):
   """
     
   d = list()
-  for c in f.coefficients():
+  for c in f.coeffs():
     if c.denominator() != 1:
       d.append(c.denominator())
   
@@ -142,7 +142,7 @@ def db_filename(f):
   filename = "../data/"
   filename += "degree" + str(f.degree()) + "_"
   filename += "id" + str(f.galois_group()).split()[3]
-  c = f.coefficients()
+  c = f.coeffs()
   for i in c:
     filename += "_" + str(i)
 

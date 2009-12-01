@@ -1,21 +1,60 @@
 load polynomial.sage
-
-d = 4
+import os.path
 
 def test_discriminant(f):
   return f.discriminant().is_square()
 
-if __name__=='__main__':
-  count = 0
-  a = 0
-  while true:
+def bruteforce(d, limit, record=False, filename='default', min=-100, max=100):
+
+  if record:
+    if filename == "default":
+      filename = "degree" + str(d)
+
+    if not os.path.isfile(filename):
+      fdb = open(filename, 'w')
+      fdb.close()
+
+    fdb = open(filename, 'a')
+
+  tried = 0
+  tried_hundred = 0
+  found = 0
+
+  while found < limit:
     f = irreducible_polynomial(d)
     if test_discriminant(f):
-      print "Count: ", count
+      print
+      print "Tried: ", tried, "polynomials"
       print "f(x) = ", f
-      break
+      
+      if record:
+        line = str()
+        for i in f.coeffs():
+          line += str(i) + ' '
+
+        fdb.write(line + "\n")
+
+      found += 1
     
-    count += 1
-    if a != int(count / 100):
-      print >> sys.stderr, count, 
-      a = int(count / 100)
+    tried += 1
+    if tried_hundred != int(tried / 100):
+      print >> sys.stderr, tried, 
+      tried_hundred = int(tried / 100)
+
+  fdb.close()
+
+def check(d, filename='default'):
+  if filename == 'default':
+    filename = "degree" + str(d)
+
+  if not os.path.isfile(filename):
+    print "The file " + filename + " does not exists."
+  else:
+    fdb = open(filename, 'r')
+
+    for line in fdb:
+      c = [int(i) for i in line.split()]
+      f = make_polynomial(c)
+      print f.galois_group()
+
+  return 0
