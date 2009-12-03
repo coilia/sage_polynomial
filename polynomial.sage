@@ -162,21 +162,21 @@ def db_record_roots(f, n=10):
   if not os.path.isfile(filename):
     fdb = open(filename, 'w')
     fdb.close()
-  fdb = open(filename, 'a')
 
   count = 0
   # Record one at a time
   for i in range(0,n):
+    fdb = open(filename, 'a')
     for q in roots_modp(f, p):
       fdb.write(str(q.numerator()) + " " + str(q.denom()) + "\n")
       count += 1
 
+    fdb.close()
     p = next_prime(p)
     print >> sys.stderr, p,
 
   print
 
-  fdb.close()
 
   return count
 
