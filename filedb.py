@@ -14,6 +14,17 @@ class FileDB():
     self.degree_prefix = "degree"
     self.gid_prefix = "id"
 
+  def add(self, f):
+    # f needs to be irreducible
+    if not f.is_irreducible():
+      print f, "is not irreducible."
+      return
+    else:
+      fname = self.poly_to_fname(f)
+      fdb = open(fname, 'w')
+      fdb.close()
+
+
   def list(self, degree=False, info= False, dictionary=False):
     files = os.listdir(self.db_dir)
 
@@ -46,7 +57,7 @@ class FileDB():
       return lst
 
   def show(self, degree=False):
-    lst = self.list(degree)
+    lst = self.list(degree, info=True)
     
     current_degree = 0
     current_group = 0
@@ -71,7 +82,7 @@ class FileDB():
   def count_roots(self, f):
     fname = self.poly_to_fname(f)
     
-    if os.path.isfile(fname):
+    if os.path.isfile(fname) and (not os.path.getsize(fname) == 0):
       with open(fname) as fdb:
         for i, l in enumerate(fdb):
           pass
@@ -171,11 +182,14 @@ class FileDB():
   def last_prime(self, f):
     fname = self.poly_to_fname(f)
     if not os.path.isfile(fname):
-      fdb = open(filename, 'w')
+      fdb = open(fname, 'w')
       fdb.close()
       p = 0
+    elif os.path.getsize(fname) == 0:
+      p = 0
     else:
-      for line in open(fname):pass
+      for line in open(fname):
+        pass
       p = QQ(line.split()[1])
 
     return p
