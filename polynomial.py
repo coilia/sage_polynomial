@@ -45,7 +45,7 @@ def random_polynomial(d, min=-100, max=100):
 
   c = random_coefficients(d+1, min, max)
   f = make_polynomial(c)
-  while not f.degree(x) == d:
+  while not f.degree() == d:
     c = random_coefficients(d+1, min, max)
     f = make_polynomial(c)
 
