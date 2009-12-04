@@ -25,7 +25,7 @@ class FileDB():
       fdb.close()
 
 
-  def list(self, degree=False, info= False, dictionary=False):
+  def list(self, degree=None, info= False, dictionary=False):
     files = os.listdir(self.db_dir)
 
     if dictionary:
@@ -33,9 +33,12 @@ class FileDB():
 
     lst = list()
     for path in files:
-      d = self.fname_to_poly(path, info=info)
+      d = self.fname_to_poly(path, info=True)
       if not degree or degree == d[0]:
-        lst.append(d)
+        if info:
+          lst.append(d)
+        else:
+          lst.append(d[2])
 
     # This sorts by degree, gid, coeffcients
     lst.sort()
@@ -145,11 +148,11 @@ class FileDB():
       return f
 
   def degree(self, f):
-    return int(f.split("_")[0][len(self.degree_prefix):])
+    return int(f.split("/")[-1].split("_")[0][len(self.degree_prefix):])
 
   def gid(self, f):
     if type(f) == str: # Filename
-      return int(f.split("_")[1][len(self.gid_prefix):])
+      return int(f.split("/")[-1].split("_")[1][len(self.gid_prefix):])
     else:
       return str(f.galois_group()).split()[3]
 
