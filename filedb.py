@@ -15,6 +15,12 @@ class FileDB():
     self.gid_prefix = "id"
 
   def add(self, f):
+    """
+    Adds a polynomial to the database by creating a file
+
+    INPUT:
+      f -- Irreducible polynomial over rationals
+    """
     # f needs to be irreducible
     if not f.is_irreducible():
       print f, "is not irreducible."
@@ -25,7 +31,20 @@ class FileDB():
       fdb.close()
 
 
-  def list(self, degree=None, info= False, dictionary=False):
+  def list(self, degree=None, info=False, dictionary=False):
+    """
+    Lists polynomials in the database
+    
+    INPUT:
+      degree [optional] -- List only the polynomials of degree
+      info [optional] -- Returns list of [d,g,f] where d = degree of f, g =
+                         Galois group id of f, f a polynomial
+      dictionary [optional] -- Returns a dictionary of dictionary of lists
+                               Top dictionary has degrees as keys
+                               Second dictionary has Galois group id as keys
+                               Lists contain polynomial functions
+
+    """
     files = os.listdir(self.db_dir)
 
     if dictionary:
@@ -78,22 +97,10 @@ class FileDB():
         print ""
         print "Galois Group:", current_group
 
-      print " ("+str(j)+") ", lst[i][2], " ["+str(self.count_roots(lst[i][2]))+"]"
+      print " ("+str(j)+") ", lst[i][2], " ["+str(self.load_roots(lst[i][2], count=True))+"]"
 
       j += 1
       
-  def count_roots(self, f):
-    fname = self.poly_to_fname(f)
-    
-    if os.path.isfile(fname) and (not os.path.getsize(fname) == 0):
-      with open(fname) as fdb:
-        for i, l in enumerate(fdb):
-          pass
-        count = i + 1
-    else:
-      count = 0
-
-    return count
 
   def load(self, degree, gid, j):
     return self.list(degree, dictionary=True)[degree][gid][j-1]
@@ -156,6 +163,32 @@ class FileDB():
     else:
       return str(f.galois_group()).split()[3]
 
+  def load_roots(self, f, count=False):
+    fname = self.poly_to_fname(f)
+
+    if not os.path.isfile(fname):
+      print "Error: ", f, "does not exist in the database"
+
+    elif os.path.getsize(fname) == 0:
+      if count:
+        return 0
+      else:
+        return []
+
+    else:
+      if count:
+        with open(fname) as fdb:
+          for i, l in enumerate(fdb):
+            pass
+          return i + 1
+      else:
+        roots = list()
+        fdb = open(fname, 'r')
+        for line in fdb:
+          roots.append(QQ(line.split()[0])/QQ(line.split()[1]))
+
+        return roots
+
   def save_roots(self, n, degree=None, gid=None, j=None, f=None):
     if degree and gid and j:
       f = self.load(degree, gid, j)
@@ -196,3 +229,34 @@ class FileDB():
       p = QQ(line.split()[1])
 
     return p
+
+  def density_plot(self, f, precision=50, start=0, stop=0):
+    density = self.density(f, precision)
+    
+    total = 0
+    for i in density.keys():
+      total += density[i]
+
+    interval = 1/precision
+    lst = list()
+    for i in density.keys():
+      lst.append(((i+0.5)*interval, density[i]/total))
+
+    return scatter_plot(lst, markersize=3)
+
+  def density(self, f, precision=50):
+    roots = self.load_roots(f)
+    
+    count = dict()
+    for i in range(0,precision):
+      count[i] = 0
+
+    interval = 1 / precision
+    for i in range(0, precision):
+      low = i*interval
+      high = (i + 1) * interval
+      for r in roots:
+        if low <= r < high:
+          count[i] += 1
+
+    return count
