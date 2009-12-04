@@ -6,6 +6,7 @@ import os
 
 class FileDB():
   """
+  File database for polynomials and its normalized roots
   """
 
   def __init__(self):
@@ -13,12 +14,15 @@ class FileDB():
     self.degree_prefix = "degree"
     self.gid_prefix = "id"
 
-  def list(self, degree=False, dictionary=False):
+  def list(self, degree=False, info= False, dictionary=False):
     files = os.listdir(self.db_dir)
+
+    if dictionary:
+      info = True
 
     lst = list()
     for path in files:
-      d = self.fname_to_poly(path, info=True)
+      d = self.fname_to_poly(path, info=info)
       if not degree or degree == d[0]:
         lst.append(d)
 
@@ -137,3 +141,41 @@ class FileDB():
       return int(f.split("_")[1][len(self.gid_prefix):])
     else:
       return str(f.galois_group()).split()[3]
+
+  def save_roots(self, n, degree=None, gid=None, j=None, f=None):
+    if degree and gid and j:
+      f = self.load(degree, gid, j)
+    elif f == None:
+      print "Error: arguments: (n, f) or (n, degree, gid, j)"
+
+    p = self.last_prime(f)
+    fname = self.poly_to_fname(f)
+
+    count = 0
+    # Record one at a time
+    for i in range(0,n):
+      fdb = open(fname, 'a')
+      for q in roots_modp(f, p):
+        fdb.write(str(q.numerator()) + " " + str(q.denom()) + "\n")
+        count += 1
+
+      fdb.close()
+      p = next_prime(p)
+      print >> sys.stderr, p,
+
+    print
+
+    return count
+
+
+  def last_prime(self, f):
+    fname = self.poly_to_fname(f)
+    if not os.path.isfile(fname):
+      fdb = open(filename, 'w')
+      fdb.close()
+      p = 0
+    else:
+      for line in open(fname):pass
+      p = QQ(line.split()[1])
+
+    return p
