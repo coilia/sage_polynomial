@@ -13,20 +13,36 @@ class FileDB():
     self.degree_prefix = "degree"
     self.gid_prefix = "id"
 
-  def listfiles(self, degree=False):
-    files = os.listdir(self.db_dir)
-
-  def list(self, degree=False):
+  def list(self, degree=False, dictionary=False):
     files = os.listdir(self.db_dir)
 
     lst = list()
     for path in files:
-      line = self.fname_to_poly(path,extra=True)
-      if not degree or degree == line[0]:
-        lst.append(line)
+      d = self.fname_to_poly(path, info=True)
+      if not degree or degree == d[0]:
+        lst.append(d)
 
     # This sorts by degree, gid, coeffcients
     lst.sort()
+
+    if dictionary:
+      dic = dict()
+      for i in lst:
+        if not dic.has_key(i[0]):
+          dic[i[0]] = dict()
+
+        if not dic[i[0]].has_key(i[1]):
+          dic[i[0]][i[1]] = list()
+
+        dic[i[0]][i[1]].append(i[2])
+
+      return dic
+
+    else:
+      return lst
+
+  def show(self, degree=False):
+    lst = self.list(degree)
     
     current_degree = 0
     current_group = 0
@@ -35,16 +51,16 @@ class FileDB():
       if current_degree != lst[i][0]:
         current_degree = lst[i][0]
         current_group = 0
-        j = 1
         print ""
         print "Degree ", current_degree
 
       if current_group != lst[i][1]:
         current_group = lst[i][1]
+        j = 1
         print ""
         print "Galois Group:", current_group
 
-      print "   ("+str(j)+") ", lst[i][2], " ("+str(self.count_roots(lst[i][2]))+")"
+      print " ("+str(j)+") ", lst[i][2], " ["+str(self.count_roots(lst[i][2]))+"]"
 
       j += 1
       
@@ -61,8 +77,8 @@ class FileDB():
 
     return count
 
-  def load(self, degree, j):
-    return
+  def load(self, degree, gid, j):
+    return self.list(degree, dictionary=True)[degree][gid][j-1]
 
   def poly_to_fname(self, f):
 
@@ -74,7 +90,7 @@ class FileDB():
     degree = str(f.degree())
     
     # Find out Galois group id
-    gid = str(f.galois_group()).split()[3]
+    gid = self.gid(f)
     try:
       int(gid)
     except:
@@ -83,10 +99,11 @@ class FileDB():
     fname = self.degree_prefix + degree + "_" + self.gid_prefix + gid + c
     return self.db_dir + fname
 
-  def fname_to_poly(self, fname, extra=False):
+  def fname_to_poly(self, fname, info=False):
+    degree = self.degree(fname)
+    gid = self.gid(fname)
+
     name = fname.split("_")
-    degree = int(name[0][6:])
-    gid = int(name[1][2:])
     c = list()
     for i in name[2:]:
       try:
@@ -107,7 +124,16 @@ class FileDB():
       print f.galois_group()
       print "Galois group does not match: ", fname
 
-    if extra:
+    if info:
       return [degree, gid, f]
     else:
       return f
+
+  def degree(self, f):
+    return int(f.split("_")[0][len(self.degree_prefix):])
+
+  def gid(self, f):
+    if type(f) == str: # Filename
+      return int(f.split("_")[1][len(self.gid_prefix):])
+    else:
+      return str(f.galois_group()).split()[3]
