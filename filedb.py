@@ -21,10 +21,11 @@ class FileDB():
 
     lst = list()
     for path in files:
-      line = self.filename_to_poly(path,extra=True)
+      line = self.fname_to_poly(path,extra=True)
       if not degree or degree == line[0]:
         lst.append(line)
 
+    # This sorts by degree, gid, coeffcients
     lst.sort()
     
     current_degree = 0
@@ -48,10 +49,10 @@ class FileDB():
       j += 1
       
   def count_roots(self, f):
-    filename = self.poly_to_filename(f)
+    fname = self.poly_to_fname(f)
     
-    if os.path.isfile(filename):
-      with open(filename) as fdb:
+    if os.path.isfile(fname):
+      with open(fname) as fdb:
         for i, l in enumerate(fdb):
           pass
         count = i + 1
@@ -63,7 +64,7 @@ class FileDB():
   def load(self, degree, j):
     return
 
-  def poly_to_filename(self, f):
+  def poly_to_fname(self, f):
 
     # Read coefficients
     c = str()
@@ -79,11 +80,11 @@ class FileDB():
     except:
       print "Error reading Galois group id"
 
-    filename = self.degree_prefix + degree + "_" + self.gid_prefix + gid + c
-    return self.db_dir + filename
+    fname = self.degree_prefix + degree + "_" + self.gid_prefix + gid + c
+    return self.db_dir + fname
 
-  def filename_to_poly(self, filename, extra=False):
-    name = filename.split("_")
+  def fname_to_poly(self, fname, extra=False):
+    name = fname.split("_")
     degree = int(name[0][6:])
     gid = int(name[1][2:])
     c = list()
@@ -91,20 +92,20 @@ class FileDB():
       try:
         i = QQ(i)
       except:
-        print "Error reading file name of: ", filename
+        print "Error reading file name of: ", fname
 
       c.append(i)
 
     # Integrity Checks
     if degree != (len(c) - 1):
-      print "Degree and number of coefficients do not match in: ", filename
+      print "Degree and number of coefficients do not match in: ", fname
 
     # Make polynomial, check galois group
     f = make_polynomial(c)
     if gid != int(str(f.galois_group()).split()[3]):
       print gid
       print f.galois_group()
-      print "Galois group does not match: ", filename
+      print "Galois group does not match: ", fname
 
     if extra:
       return [degree, gid, f]
