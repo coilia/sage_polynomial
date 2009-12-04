@@ -143,7 +143,7 @@ def db_filename(f):
   returns string
     filename composed of degree, galois group id, and coefficients
   """
-  filename = "../data/"
+  filename = "data/"
   filename += "degree" + str(f.degree()) + "_"
   filename += "id" + str(f.galois_group()).split()[3]
   c = f.coeffs()
