@@ -237,10 +237,10 @@ class FileDB():
     for i in density.keys():
       total += density[i]
 
-    interval = 1/precision
+    interval = 1/QQ(precision)
     lst = list()
     for i in density.keys():
-      lst.append(((i+0.5)*interval, density[i]/total))
+      lst.append(((i+0.5)*interval, density[i]/QQ(total)))
 
     return scatter_plot(lst, markersize=3)
 
@@ -251,12 +251,18 @@ class FileDB():
     for i in range(0,precision):
       count[i] = 0
 
-    interval = 1 / precision
+    interval = QQ(1) / QQ(precision)
     for i in range(0, precision):
       low = i*interval
       high = (i + 1) * interval
+      
       for r in roots:
         if low <= r < high:
           count[i] += 1
 
     return count
+
+  def flat_plot(self, f):
+    roots = self.load_roots(f)
+
+    return scatter_plot([(i,0) for i in roots], markersize=4)
