@@ -263,6 +263,19 @@ class FileDB():
     return count
 
   def flat_plot(self, f):
-    roots = self.load_roots(f)
+    color = "#336699"
+    
+    if type(f) == list:
+      plot = scatter_plot([])
+      for i in range(len(f)):
+        roots = self.load_roots(f[i])
+        plot += scatter_plot([(j,i+0.5) for j in roots], markersize=4, facecolor=color)
+        group = "Gid: " + str(self.gid(f[i]))
+        count = " with " + str(len(roots)) + " roots: "
+        plot += text(group+count+str(f[i]), (0,i+0.8), fontsize=8, rgbcolor=(20,20,20), horizontal_alignment="left")
 
-    return scatter_plot([(i,0) for i in roots], markersize=4)
+      return plot
+
+    else:
+      roots = self.load_roots(f)
+      return scatter_plot([(i,0) for i in roots], markersize=4)
