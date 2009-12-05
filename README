@@ -1,7 +1,7 @@
 The scripts here are to be used with Sage.
 
 Run Sage in the directory with these scripts, then do:
-  sage: load "polynomial.sage"
+  sage: load "polynomial.py"
 
 
 Examples
@@ -27,26 +27,3 @@ Generating Normalized roots:
 # with 2
 
   sage: roots_modp(f,2,10)
-
-# You can save this in a file. This records normalized roots of 10 primes.
-# If the database already exists, it will read the last line, and will continue
-# from there.
-
-  sage: db_record_roots(f, 10)
-
-#NOTE: This will give you an error if there is no directory called "data" in the
-PARENT directory of the current directory.
-
-
-# From the file database, you can make a plot...a dumb one though:
-
-  sage: dumb_plot(f)
-
-# You can also make a plot without a database. This will take long for large n:
-  
-  sage: dumb_plot(f,100)
-
-NOTE: This functionality was created so that you can test out plots with online
-interface, since you cannot create files there.
-For running on your computer, create the database first by running
-db_record_roots(f, n) first and then plot it.
