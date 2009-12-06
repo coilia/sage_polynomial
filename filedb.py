@@ -262,20 +262,68 @@ class FileDB():
 
     return count
 
-  def flat_plot(self, f):
-    color = "#336699"
+  def flat_plot(self, f, limit=None):
+    colors = ["#FF0000", "#000000", "#FFFF00", "#0000FF", "#FF00FF", "#808080",
+              "#008000", "#00FF00", "#800000", "#000080", "#808000", "#800080", 
+              "#C0C0C0", "#00FFFF", "#008080"]
     
-    if type(f) == list:
-      plot = scatter_plot([])
-      for i in range(len(f)):
-        roots = self.load_roots(f[i])
-        plot += scatter_plot([(j,i+0.5) for j in roots], markersize=4, facecolor=color)
-        group = "Gid: " + str(self.gid(f[i]))
-        count = " with " + str(len(roots)) + " roots: "
-        plot += text(group+count+str(f[i]), (0,i+0.8), fontsize=8, rgbcolor=(20,20,20), horizontal_alignment="left")
+    if type(f) != list:
+      f = [f]
 
-      return plot
+    # Empty plot
+    plot = scatter_plot([])
 
-    else:
-      roots = self.load_roots(f)
-      return scatter_plot([(i,0) for i in roots], markersize=4)
+    # For color coordination
+    classes = list()
+
+    for i in range(len(f)):
+      # Identify a class of f by degree, group id tuple
+      degree = f[i].degree()
+      gid = self.gid(f[i])
+      id = (degree, gid)
+      if classes.count(id) == 0:
+        classes.append(id)
+      color = classes.index(id)
+
+      # Generate Plots
+      roots = self.load_roots(f[i])[:limit]
+      points = [(j,i+0.5) for j in roots]
+      plot_opts = {'markersize':10, 
+                   'facecolor':colors[color], 'edgecolor':colors[1]}
+      plot += scatter_plot(points, **plot_opts)
+
+      # Labels
+      count = len(roots)
+      if limit and count == limit:
+        if i == (len(f) - 1):
+          plot += text(str(count), (1,i+0.8), horizontal_alignment='right')
+        label = "D" + str(degree) + "G" + str(gid)
+      else:
+        label = "D" + str(degree) + "G" + str(gid) + "(" + str(count) + ")" 
+
+      label_opts = {'fontsize':8, 'rgbcolor':(20,20,20),
+                    'horizontal_alignment':'left'}
+      plot += text(label, (0.01,i+0.8), **label_opts)
+
+    return plot
+
+  def animate_flat_plot(self, f, step=10, limit=None, figsize=[15,2]):
+
+    # Figure out how many frames we will have
+    # ...not very efficient
+    max = 0
+    for i in range(len(f)):
+      n = len(self.load_roots(f[i]))
+      if max < n:
+        max = n
+
+    if (limit and max < limit) or not limit:
+      limit = max
+    frames = int(limit/step) + 1
+
+    plots = list()
+    for i in range(frames):
+      j = (i + 1) * step
+      plots.append(self.flat_plot(f, j))
+
+    return animate(plots, figsize=figsize)
